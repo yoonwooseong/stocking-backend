@@ -53,10 +53,16 @@ public class StockController {
 	//일단 아직 수정예정,,
 	@RequestMapping(value = "/detail")
 	@ResponseBody
-	public String stock(@RequestParam("code") String itemcode){
+	public String stock(@RequestParam("itemcode") String itemcode){
 
 
 		return stockService.stock(itemcode);
+	}
+
+	@RequestMapping(value = "/totalList")
+	@ResponseBody
+	public String fullStockList(){
+		return stockService.fullStockList();
 	}
 
 
