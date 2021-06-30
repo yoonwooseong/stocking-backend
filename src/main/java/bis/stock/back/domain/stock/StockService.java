@@ -3,22 +3,50 @@ package bis.stock.back.domain.stock;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import bis.stock.back.domain.stock.dto.Stock;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class StockService { //
+public class StockService { 
+
+	private StockRepository stockRepository;
+
+	@PersistenceContext
+	private EntityManager em;
+	
+	public List<Stock> totalList() {
+
+		return em.createQuery("select s from Stock s", Stock.class)
+				.getResultList();
+	}
+
+	public String findcode(String itemname) {
+
+		return em.createQuery("select s from Stock s where s.name = :name", Stock.class)
+				.setParameter("name", itemname)
+				.getSingleResult().getCode();
+	}
+
+	public String detail(String itemcode, String itemname) {
+
 
 	public String stock(String itemcode) {
-
+    
 		String line ="";
 		String result = "";
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -33,6 +61,7 @@ public class StockService { //
 			while((line = br.readLine())!=null) {
 				result = result.concat(line);
 			}
+			
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(result);
 			System.out.println(obj.toString());
@@ -61,6 +90,7 @@ public class StockService { //
 			res.put("low", low);
 			res.put("rate", rate);
 			res.put("amount", amount);
+
 			System.out.println(res.toString());
 
 			br.close();
@@ -68,10 +98,10 @@ public class StockService { //
 
 		}
 
-
 		return res.toJSONString();
 
 	}
+
 
 public String fullStockList() {
 		//임시 목업 코드 다른서버에서 구현할 기능
@@ -99,5 +129,4 @@ public String fullStockList() {
 		}
 		return res.toJSONString();
 	}
-
 }

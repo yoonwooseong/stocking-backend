@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bis.stock.back.domain.auth.AuthService;
 import bis.stock.back.domain.auth.dto.JoinDto;
+import bis.stock.back.domain.stock.dto.Stock;
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
@@ -39,24 +41,53 @@ public class StockController {
 	@Autowired
 	StockService stockService;
 
-	//이부분은 나중에 detail로 갈 때 주식 코드 보내주는 거로 나중에 필요한곳에 옮기면된다,,,
-	@RequestMapping(value="/code") //보려면 일단 /code로 들어가면 됩니다
-	public RedirectView login(RedirectAttributes redirect) {
-
-		//주식 코드 db 만들면 받아오는거로 변경 예정 일단 아직은 임의 코드
-		String code = "005930";
-
-		redirect.addAttribute("code", code);
-		return new RedirectView("/stock/detail");
-	}
-
-	//일단 아직 수정예정,,
-	@RequestMapping(value = "/detail")
 	@ResponseBody
-	public String stock(@RequestParam("itemcode") String itemcode){
+	@RequestMapping(value="/detail")					//defaultValue 지워도 됨 아직 편의상 넣어둠
+	public String detail(@RequestParam(value="itemname", defaultValue="삼성전자") String itemname, RedirectAttributes redirect) {
+		
+		String itemcode = stockService.findcode(itemname);
+		
+		//실제로는 필요없음 -> 어차피 주식 코드 넘겨줄 때(totalList에서)다 변환해서 옴. 하지만 아직 받아서 오는게 아니므로 넣어뒀다.
+		try {
+			itemcode = String.format("%06d", Integer.parseInt(itemcode)).toString();
+		} catch (Exception e) {
+			
+		}
+	
+		return stockService.detail(itemcode, itemname);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/totalList")
+	public JSONObject totalList() {
+		List<Stock> totalList = stockService.totalList();
+		
+		JSONObject res = new JSONObject();
+		List<JSONObject> stockList = new ArrayList<JSONObject>();
+		
+		for(int i = 0; i < totalList.size(); i++) {
+			JSONObject stock_info = new JSONObject();
+			String itemcode = totalList.get(i).getCode();
+			
+			try {
+				itemcode = String.format("%06d", Integer.parseInt(itemcode)).toString();
+			} catch (Exception e) {
+				//코드 뒤에 K , L 등 붙은 코드일 경우
+			}
+			stock_info.put("stockID", totalList.get(i).getId()); // 쓸지말지 결정 후 변경.
+			stock_info.put("itemcode", itemcode);
+			stock_info.put("itemname", totalList.get(i).getName());
+			stock_info.put("category", totalList.get(i).getCategory());
+			
+			stockList.add(stock_info);
+			
+		}
+		
+		res.put("stockList", stockList);
 
+		
+		return res;
 
-		return stockService.stock(itemcode);
 	}
 
 	@RequestMapping(value = "/totalList")
