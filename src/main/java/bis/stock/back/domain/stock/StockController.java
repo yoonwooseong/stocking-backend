@@ -87,6 +87,13 @@ public class StockController {
 
 		
 		return res;
+
+	}
+
+	@RequestMapping(value = "/totalList")
+	@ResponseBody
+	public String fullStockList(){
+		return stockService.fullStockList();
 	}
 
 
