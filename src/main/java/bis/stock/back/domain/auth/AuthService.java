@@ -58,12 +58,12 @@ public class AuthService {
                 .orElseThrow(() -> new InternalAuthenticationServiceException("가입되지 않은 email입니다."));
 
         if(!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("잘못된 비밀번호 입니다.");
+            throw new InternalAuthenticationServiceException("잘못된 비밀번호 입니다.");
         }
 
         // user 엔티티의 정보로 jwt 토큰(문자열) 만들기
-        String accessTokenJwt = jwtTokenProvider.createAccessToken(user.getUsername(), user.getRoles());
-        String refreshTokenJwt = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getRoles());
+        String accessTokenJwt = jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles());
+        String refreshTokenJwt = jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername(), user.getRoles());
 
         // jwt 토큰을 쿠키로 만들기
         Cookie accessToken = cookieUtil.createCookie("accessToken",
@@ -115,7 +115,8 @@ public class AuthService {
             if(check.equals(user.getEmail())) {
 
                 // jwtTokenProvider로부터 accessToken 생성
-                String accessTokenJwt = jwtTokenProvider.createAccessToken(user.getUsername(), user.getRoles());
+                String accessTokenJwt = jwtTokenProvider
+                        .createAccessToken(user.getId(), user.getUsername(), user.getRoles());
                 // 새로운 access 토큰 쿠키를 생성
                 Cookie newAccessToken = cookieUtil.createCookie("accessToken",
                         accessTokenJwt, jwtTokenProvider.ACCESS_TOKEN_VALID_TIME, "/");
