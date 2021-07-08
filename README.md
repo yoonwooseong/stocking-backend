@@ -22,7 +22,7 @@ Stocking 프로젝트 Backend 레포지토리
 
 <br>
 
-## ✏ Backend 요구사항 분석  
+## ✏ 요구사항 분석 (Backend)  
 
 - 로그인 기능 구현 (JWT + Spring Security, redis)  
 
