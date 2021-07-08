@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -14,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Entity(name="deposit")
+@Table(name="deposit")
 @Getter
 public class Deposit {
 
@@ -43,6 +45,13 @@ public class Deposit {
     	this.contents = contents;
     	this.amount = amount;
     	this.date = date;
+    }
+
+    public void update(String user_id, String contents, Long amount, Date date) {
+    	this.user_id = user_id;
+		this.contents = contents;
+		this.amount = amount;
+		this.date = date;
     }
 
 
