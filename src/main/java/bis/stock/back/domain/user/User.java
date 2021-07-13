@@ -1,5 +1,6 @@
 package bis.stock.back.domain.user;
 
+import bis.stock.back.domain.user.dto.UserUpdateDto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -86,5 +87,11 @@ public class User implements UserDetails{
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void update(UserUpdateDto userUpdateDto) {
+        this.email = userUpdateDto.getEmail();
+        this.password = userUpdateDto.getPassword();
+        this.nickname = userUpdateDto.getNickname();
     }
 }
