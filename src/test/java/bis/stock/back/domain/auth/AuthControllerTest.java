@@ -136,7 +136,7 @@ class AuthControllerTest {
          * 그 후 redis에 해당 refreshToken을 저장하고 쿠키로도 만든다.
          * 왜냐, 비즈니스 로직에 redis에 저장된 refreshToken을 확인하는 절차가 있기 때문에.
          */
-        String refreshTokenJwt = jwtTokenProvider.createRefreshToken(user.getUsername(), user.getRoles());
+        String refreshTokenJwt = jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername(), user.getRoles());
         redisUtil.setDataExpire(refreshTokenJwt, "test@test.com", 100);
         Cookie refreshToken = new Cookie("refreshToken", refreshTokenJwt);
 
