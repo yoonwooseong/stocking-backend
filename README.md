@@ -2,7 +2,8 @@
 
 ## 🔗 Link
 
- - [Stocking RS](http://13.209.5.25:8080/)
+ - [Stocking RS](http://52.78.111.36:8080/)
+
 
 <br>
 
@@ -19,6 +20,8 @@ Stocking 프로젝트 Backend 레포지토리
  - __ER 다이어그램__ : [Stocking ERD](https://www.erdcloud.com/d/ZQjY97KMQrEthMPyn)  
 
  - __스토리보드__ : [카카오오븐](https://ovenapp.io/view/DOhZ6TnDKWFjINtQKjnj2RAulxojOZCb#3QyvB)
+
+ - __API 문서__ : [Swagger](http://52.78.111.36:8080/swagger-ui.html)
 
 <br>
 
