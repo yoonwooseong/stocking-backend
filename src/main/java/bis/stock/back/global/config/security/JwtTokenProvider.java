@@ -38,10 +38,11 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createAccessToken(String userName, List<UserRole> roles) {
+    public String createAccessToken(Long id, String userName, List<UserRole> roles) {
 
         Claims claims = Jwts.claims().setSubject(userName); // JWT payload에 저장되는 정보 단위
         claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("id", id);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
@@ -52,10 +53,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(String userName, List<UserRole> roles) {
+    public String createRefreshToken(Long id, String userName, List<UserRole> roles) {
 
         Claims claims = Jwts.claims().setSubject(userName); // JWT payload에 저장되는 정보 단위
         claims.put("role", roles); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("id", id);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
