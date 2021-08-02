@@ -1,12 +1,9 @@
 package bis.stock.back.domain.asset;
 
-import java.util.Optional;
-
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import bis.stock.back.domain.asset.dto.Deposit;
-import bis.stock.back.domain.user.User;
 
 public interface DepositRepository extends JpaRepository<Deposit, Long>{
-	Optional<User> findById(String user_id);
+	List<Deposit> findAllById(String user_id);
 }

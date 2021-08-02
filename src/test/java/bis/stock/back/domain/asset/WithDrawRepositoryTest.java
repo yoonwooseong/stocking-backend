@@ -11,37 +11,37 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import bis.stock.back.domain.asset.dto.Deposit;
+import bis.stock.back.domain.asset.dto.Withdraw;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class DepositRepositoryTest {
+public class WithDrawRepositoryTest {
 
 	@Autowired
-	private DepositRepository depositRepository;
+	private WithdrawRepository withdrawRepository;
 	Date now = new Date();
-	Deposit deposit = Deposit.builder()
+	Withdraw withdraw = Withdraw.builder()
 							.user_id("wooseong")
 							.contents("Salary")
 							.amount(2500000L)
 							.date(now)
 							.build();
 
-	Deposit saveDeposit;
+	Withdraw saveWithdraw;
 
     @BeforeEach
-    void 테스트수입기록생성() {
-    	saveDeposit = depositRepository.save(deposit);
+    void 테스트지출기록생성() {
+    	saveWithdraw = withdrawRepository.save(withdraw);
     }
 
     @Test
-    void 수입저장() {
-        assertThat(saveDeposit).isEqualTo(deposit);
+    void 지출기록저장() {
+        assertThat(saveWithdraw).isEqualTo(withdraw);
     }
 
 //    @Test
-//    void 수입삭제() {
-//    	depositRepository.delete(deposit);
-//        assertThat(depositRepository.findById("wooseong").orElse(null)).isNull();
+//    void 지출기록삭제() {
+//    	withdrawRepository.delete(withdraw);
+//        assertThat(withdrawRepository.findById("wooseong").orElse(null)).isNull();
 //    }
 }
