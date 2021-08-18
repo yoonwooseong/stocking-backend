@@ -1,16 +1,22 @@
 package bis.stock.back.domain.stock;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.opencsv.CSVReader;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.exceptions.CsvException;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +29,29 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class StockService {
 
-   private StockRepository stockRepository;
+   private final StockRepository stockRepository;
 
    @PersistenceContext
    private EntityManager em;
+
+   @PostConstruct // init
+   public void stockListUpdate() throws UnsupportedEncodingException {
+
+      // 만약 테이블이 비어있으면 실행하기. 안비어있으면 그냥 넘어감
+      if(totalList().size() != 0) {
+         return;
+      }
+
+      // resource에서 input.csv(다운받아서 넣어놈)을 읽어와서 Stock객체의 배열로 변환함
+      InputStream is = getClass().getResourceAsStream("/input.csv");
+      List<Stock> stockList = new CsvToBeanBuilder<Stock>(new InputStreamReader(is, "EUC-KR"))
+              .withType(Stock.class)
+              .build()
+              .parse();
+
+      // 한꺼번에 저장
+      stockRepository.saveAll(stockList);
+   }
 
    public List<Stock> totalList() {
 
@@ -86,5 +111,8 @@ public class StockService {
 
    }
 
+   public List<Stock> list() {
 
+      return stockRepository.findAll();
+   }
 }

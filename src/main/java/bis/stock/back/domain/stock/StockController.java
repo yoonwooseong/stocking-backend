@@ -38,8 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/stock")
 public class StockController {
 
-   @Autowired
-   StockService stockService;
+   private final StockService stockService;
 
    @ResponseBody
    @RequestMapping(value="/detail")               //defaultValue 지워도 됨 아직 편의상 넣어둠
@@ -86,6 +85,11 @@ public class StockController {
       return res.put("stockList", stockList);
    }
 
+   @GetMapping("/list")
+   public ResponseEntity<List> list() {
+
+      return ResponseEntity.ok(stockService.list());
+   }
 
    @ResponseBody
    @RequestMapping(value="/myList")
