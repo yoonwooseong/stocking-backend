@@ -56,6 +56,13 @@ public class StockController {
       return stockService.detail(itemcode, itemname);
    }
 
+   @GetMapping("/detail")
+   public String getStockByCode(@RequestParam(value="itemCode") String itemCode) {
+
+      String itemName = stockService.findName(itemCode);
+      return stockService.detail(itemCode, itemName);
+   }
+
    @ResponseBody
    @RequestMapping(value="/totalList")
    public Object totalList() {

@@ -2,23 +2,17 @@ package bis.stock.back.domain.stock;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.opencsv.CSVReader;
+import bis.stock.back.global.exception.NotFoundException;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.exceptions.CsvException;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -64,6 +58,11 @@ public class StockService {
       return em.createQuery("select s from Stock s where s.name = :name", Stock.class)
             .setParameter("name", itemname)
             .getSingleResult().getCode();
+   }
+
+   public String findName(String itemCode) {
+      return stockRepository.findByCode(itemCode)
+              .orElseThrow(() -> new NotFoundException("해당 이름의 주식이 존재하지 않습니다.")).getName();
    }
 
    public String detail(String itemcode, String itemname) {

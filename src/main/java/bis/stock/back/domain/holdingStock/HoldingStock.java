@@ -25,6 +25,8 @@ public class HoldingStock {
     // 성능상의 문제가 있다고 하며, 다대다 관계가 나왔다면 설계가 잘못되었다고 함.
     private String stockCode;
 
+    private String stockName;
+
     @Column
     private int amount;
 

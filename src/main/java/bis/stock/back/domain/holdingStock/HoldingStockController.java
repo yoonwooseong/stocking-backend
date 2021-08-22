@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -32,6 +31,11 @@ public class HoldingStockController {
     }
 
     // 현재 보유 주식
+    @GetMapping("stockList")
+    public ResponseEntity<List> stockList(@PathVariable Long userId) {
+
+        return ResponseEntity.ok(holdingStockService.stockList(userId));
+    }
 
 
     // 전체 주식 거래 내역
