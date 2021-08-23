@@ -22,11 +22,18 @@ public class HoldingStockService {
     private final StockRepository stockRepository;
     private final UserRepository userRepository;
 
-    public StockDto stockSave(Long userId, StockDto stockDto, boolean isBuy) {
+    public StockDto stockTrade(Long userId, StockDto stockDto, boolean isBuy) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("유저가 존재하지 않습니다."));
 
+        if(!isBuy) {
+            HashMap<String, StockListDto> stockMap = getStockHashMap(userId);
+            if(!stockMap.containsKey(stockDto.getCode())
+                    || stockMap.get(stockDto.getCode()).getAmount() < stockDto.getAmount()) {
+                throw new NotFoundException("보유한 수량보다 매도하려는 수량이 더 많습니다.");
+            }
+        }
         BuyOrSell buyOrSell = isBuy ? BuyOrSell.BUY : BuyOrSell.SELL;
 
         holdingStockRepository.save(HoldingStock.builder()
@@ -51,6 +58,11 @@ public class HoldingStockService {
 
         List<StockResponseDto> stockList = new ArrayList<>();
         List<HoldingStock> stocks = user.getHoldingStocks();
+
+        if(stocks == null) {
+            return stockList;
+        }
+
         for(int i = stocks.size() - 1; i >= 0; i--) {
             stockList.add(new StockResponseDto(stocks.get(i)));
         }
@@ -58,14 +70,17 @@ public class HoldingStockService {
         return stockList;
     }
 
-    public List<StockListDto> stockList(Long userId) {
+    public HashMap<String, StockListDto> getStockHashMap(Long userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("유저가 존재하지 않습니다."));
 
-        List<StockListDto> stockList = new ArrayList<>();
         List<HoldingStock> stocks = user.getHoldingStocks();
         HashMap<String, StockListDto> stockMap = new HashMap<>();
+
+        if(stocks == null) {
+            return stockMap;
+        }
 
         for(HoldingStock entity : stocks) {
             String code = entity.getStockCode();
@@ -95,6 +110,18 @@ public class HoldingStockService {
                     stockMap.put(code, value);
                 }
             }
+        }
+
+        return stockMap;
+    }
+
+    public List<StockListDto> stockList(Long userId) {
+
+        List<StockListDto> stockList = new ArrayList<>();
+        HashMap<String, StockListDto> stockMap = getStockHashMap(userId);
+
+        if(stockMap == null) {
+            return stockList;
         }
 
         stockMap.forEach((key, value) -> {

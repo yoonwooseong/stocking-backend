@@ -19,7 +19,7 @@ public class HoldingStockController {
     public ResponseEntity<StockDto> buyStock(@PathVariable Long userId,
                                              @RequestBody StockDto stockDto) {
 
-        return ResponseEntity.ok(holdingStockService.stockSave(userId, stockDto, true));
+        return ResponseEntity.ok(holdingStockService.stockTrade(userId, stockDto, true));
     }
 
     // 주식 판매 입력
@@ -27,7 +27,7 @@ public class HoldingStockController {
     public ResponseEntity<StockDto> sellStock(@PathVariable Long userId,
                                              @RequestBody StockDto stockDto) {
 
-        return ResponseEntity.ok(holdingStockService.stockSave(userId, stockDto, false));
+        return ResponseEntity.ok(holdingStockService.stockTrade(userId, stockDto, false));
     }
 
     // 현재 보유 주식
