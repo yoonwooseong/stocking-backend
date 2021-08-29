@@ -3,16 +3,9 @@ package bis.stock.back.domain.stock.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+import bis.stock.back.domain.stock.StockPrice;
 import bis.stock.back.domain.user.UserRole;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
@@ -61,6 +54,10 @@ public class Stock {
 	@Column
 	@CsvBindByName(column = "액면가")
 	private String faceValue;
+
+	@OneToOne
+	@JoinColumn(name = "stock_price_id")
+	private StockPrice stockPrice;
 
     @Builder
     public Stock(String name, String code, String category) {

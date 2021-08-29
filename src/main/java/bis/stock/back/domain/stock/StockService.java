@@ -31,11 +31,6 @@ public class StockService {
    @PostConstruct // init
    public void stockListUpdate() throws UnsupportedEncodingException {
 
-      // 만약 테이블이 비어있으면 실행하기. 안비어있으면 그냥 넘어감
-      if(totalList().size() != 0) {
-         return;
-      }
-
       // resource에서 input.csv(다운받아서 넣어놈)을 읽어와서 Stock객체의 배열로 변환함
       InputStream is = getClass().getResourceAsStream("/input.csv");
       List<Stock> stockList = new CsvToBeanBuilder<Stock>(new InputStreamReader(is, "EUC-KR"))
@@ -43,8 +38,11 @@ public class StockService {
               .build()
               .parse();
 
-      // 한꺼번에 저장
-      stockRepository.saveAll(stockList);
+      if(stockRepository.count() != stockList.size()) {
+         // 한꺼번에 저장
+         stockRepository.saveAll(stockList);
+      }
+
    }
 
    public List<Stock> totalList() {
