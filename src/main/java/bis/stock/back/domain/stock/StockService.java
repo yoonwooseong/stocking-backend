@@ -2,11 +2,14 @@ package bis.stock.back.domain.stock;
 
 import java.io.*;
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import bis.stock.back.global.exception.NotFoundException;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -21,9 +24,12 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class StockService {
 
    private final StockRepository stockRepository;
+
+   private final StockPriceRepository stockPriceRepository;
 
    @PersistenceContext
    private EntityManager em;
@@ -108,8 +114,85 @@ public class StockService {
 
    }
 
+   public Stock getStock(String itemCode) {
+
+      Stock stock = stockRepository.findByCode(itemCode).orElseThrow(() -> new NotFoundException("종목 코드 오류"));
+
+      stockPriceChecker(stock);
+
+      return stock;
+   }
+
+   @Transactional
+   public void stockPriceChecker(Stock stock) {
+
+      // 만약 주식 가격 조회 값이 없으면 조회하기
+      if(stock.getPrice() == null) {
+         StockPrice stockPrice = updateStockPrice(stock.getCode());
+         saveStockPrice(stockPrice);
+         stock.setStockPrice(stockPrice);
+      } else {
+         // 가장 최근에 조회한 주식 가격이 5초 이전이면 다시 받아오기.
+         Duration dur = Duration.between(stock.getPrice().getRecentUpdateTime(), LocalDateTime.now());
+
+         if(dur.getSeconds() > 5) {
+            stock.getPrice().setStockPrice(updateStockPrice(stock.getCode()));
+         }
+      }
+   }
+
+   public void saveStockPrice(StockPrice stockPrice) {
+      stockPriceRepository.save(stockPrice);
+   }
+
+   public StockPrice updateStockPrice(String itemCode) {
+
+      String line ="";
+      String result = "";
+      StockPrice stockPrice = null;
+      Stock stock = stockRepository.findByCode(itemCode).orElseThrow(() -> new NotFoundException("종목 코드 오류"));
+
+      try {
+         String urlstr = "https://api.finance.naver.com/service/itemSummary.nhn?itemcode=" + itemCode;
+         URL url = new URL(urlstr);
+
+         BufferedReader br;
+         br = new BufferedReader(new InputStreamReader(url.openStream()));
+         while((line = br.readLine())!=null) {
+            result = result.concat(line);
+         }
+
+         JSONParser parser = new JSONParser();
+         JSONObject obj = (JSONObject) parser.parse(result);
+         String amount = obj.get("amount").toString();//거래량
+         String high = obj.get("high").toString(); //고점
+         String rate = obj.get("rate").toString(); //등락비율
+         String low = obj.get("low").toString(); //저점
+         String now = obj.get("now").toString(); //현재가
+         String diff = obj.get("diff").toString();//등락폭
+
+         stockPrice = StockPrice.builder()
+                 .stock(stock)
+                 .amount(Integer.parseInt(amount))
+                 .rate(Float.parseFloat(rate))
+                 .now(Integer.parseInt(now))
+                 .high(Integer.parseInt(high))
+                 .low(Integer.parseInt(low))
+                 .diff(Integer.parseInt(diff))
+                 .recentUpdateTime(LocalDateTime.now())
+                 .build();
+
+         br.close();
+      }catch (Exception e) {
+         System.out.println("종목 불러오기 오류");
+      }
+
+      return stockPrice;
+   }
+
    public List<Stock> list() {
 
+      // TODO : 추후에 Pageable 구현
       return stockRepository.findAll();
    }
 }

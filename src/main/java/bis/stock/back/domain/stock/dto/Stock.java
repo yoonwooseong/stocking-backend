@@ -7,6 +7,10 @@ import javax.persistence.*;
 
 import bis.stock.back.domain.stock.StockPrice;
 import bis.stock.back.domain.user.UserRole;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import lombok.Builder;
@@ -19,7 +23,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Stock {
-	
+
+	@JsonIgnore
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
@@ -55,9 +60,10 @@ public class Stock {
 	@CsvBindByName(column = "액면가")
 	private String faceValue;
 
+	@JsonManagedReference
 	@OneToOne
 	@JoinColumn(name = "stock_price_id")
-	private StockPrice stockPrice;
+	private StockPrice price;
 
     @Builder
     public Stock(String name, String code, String category) {
@@ -65,4 +71,8 @@ public class Stock {
     	this.code = code;
     	this.category = category;
     }
+
+	public void setStockPrice(StockPrice stockPrice) {
+		this.price = stockPrice;
+	}
 }
