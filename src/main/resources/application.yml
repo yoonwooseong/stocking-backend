@@ -1,5 +1,11 @@
 # 공통사항들 모아놓음
+
 spring:
+  # TODO : 기본적으로 Http exeption의 메세지를 표시하지 않도록 되어있음. (보안 문제) 메세지는 표시되도록 풀어주기
+  server:
+    error:
+      include-message: true
+
   profiles:
     active: local
 

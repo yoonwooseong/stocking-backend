@@ -41,7 +41,7 @@ public class StockController {
       return stockService.detail(itemCode, itemName);
    }
 
-   // ...:8080/stock/005930
+   // ...:8080/stock/005930 (Item code)
    @GetMapping("/{code}")
    public ResponseEntity<Stock> getStockByCode(@PathVariable String code) {
 
