@@ -2,7 +2,9 @@ package bis.stock.back.domain.stock;
 
 import java.io.*;
 import java.net.URL;
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -132,11 +134,52 @@ public class StockService {
          saveStockPrice(stockPrice);
          stock.setStockPrice(stockPrice);
       } else {
-         // 가장 최근에 조회한 주식 가격이 5초 이전이면 다시 받아오기.
-         Duration dur = Duration.between(stock.getPrice().getRecentUpdateTime(), LocalDateTime.now());
+         LocalDate nowDate = LocalDate.now();
+         DayOfWeek nowDay = nowDate.getDayOfWeek();
+         int nowHour = LocalDateTime.now().getHour();
 
-         if(dur.getSeconds() > 5) {
-            stock.getPrice().setStockPrice(updateStockPrice(stock.getCode()));
+         // 주말일 경우
+         if(nowDay == DayOfWeek.SATURDAY || nowDay == DayOfWeek.SUNDAY) {
+            LocalDate recentMarketDate = LocalDate.now().minusDays((nowDay == DayOfWeek.SATURDAY ? 1 : 2));
+            LocalDateTime recentMarketTime = LocalDateTime.of(
+                    recentMarketDate.getYear(),
+                    recentMarketDate.getMonth(),
+                    recentMarketDate.getDayOfMonth(),
+                    16,
+                    00
+            );
+            if(!stock.getPrice().getRecentUpdateTime().isAfter(recentMarketTime)) {
+               stock.getPrice().setStockPrice(updateStockPrice(stock.getCode()));
+            }
+         } else { // 평일일 경우
+            // 장이 열려있는 경우
+            if(nowHour > 9 && nowHour < 16) {
+               // 가장 최근에 조회한 주식 가격이 5초 이전이면 다시 받아오기.
+               Duration dur = Duration.between(stock.getPrice().getRecentUpdateTime(), LocalDateTime.now());
+
+               if(dur.getSeconds() > 5) {
+                  stock.getPrice().setStockPrice(updateStockPrice(stock.getCode()));
+               }
+            } else { // 장이 마감된 경우
+               LocalDate recentMarketDate = LocalDate.now();
+               if(nowHour < 9) {
+                  if(nowDay == DayOfWeek.MONDAY) {
+                     recentMarketDate = LocalDate.now().minusDays(3);
+                  } else {
+                     recentMarketDate = LocalDate.now().minusDays(1);
+                  }
+               }
+               LocalDateTime recentMarketTime = LocalDateTime.of(
+                       recentMarketDate.getYear(),
+                       recentMarketDate.getMonth(),
+                       recentMarketDate.getDayOfMonth(),
+                       16,
+                       00
+               );
+               if(!stock.getPrice().getRecentUpdateTime().isAfter(recentMarketTime)) {
+                  stock.getPrice().setStockPrice(updateStockPrice(stock.getCode()));
+               }
+            }
          }
       }
    }
