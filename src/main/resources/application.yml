@@ -19,8 +19,6 @@ spring:
     type: redis
     port: 6379
 
-  redis:
-    host: 34.83.181.251
 
   jpa:
     generate-ddl: true
@@ -36,6 +34,8 @@ spring:
 
 # 배포용 profile
 spring:
+  redis:
+    host: redis
   config:
     activate:
       on-profile: prod
@@ -51,6 +51,8 @@ spring:
 # 146.56.100.95 - oracle
 # 52.78.111.36 - 우성이 aws
 spring:
+  redis:
+    host: 146.56.100.95
   config:
     activate:
       on-profile: local
