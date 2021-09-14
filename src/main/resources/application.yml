@@ -1,5 +1,4 @@
 # 공통사항들 모아놓음
-
 spring:
   # TODO : 기본적으로 Http exeption의 메세지를 표시하지 않도록 되어있음. (보안 문제) 메세지는 표시되도록 풀어주기
   server:
@@ -19,7 +18,6 @@ spring:
     type: redis
     port: 6379
 
-
   jpa:
     generate-ddl: true
     database: mysql
@@ -31,7 +29,6 @@ spring:
         # 운영환경에서는 sout이 아닌 log로 나타내야 한다
         format_sql: true
 ---
-
 # 배포용 profile
 spring:
   redis:
