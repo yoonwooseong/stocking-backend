@@ -153,7 +153,7 @@ public class StockService {
             }
          } else { // 평일일 경우
             // 장이 열려있는 경우
-            if(nowHour > 9 && nowHour < 16) {
+            if(nowHour >= 9 && nowHour < 16) {
                // 가장 최근에 조회한 주식 가격이 5초 이전이면 다시 받아오기.
                Duration dur = Duration.between(stock.getPrice().getRecentUpdateTime(), LocalDateTime.now());
 
