@@ -80,7 +80,7 @@ $ git pull https://github.com/Beauty-inside/stocking-backend.git
 $ ./gradlew
 
 # arm64 기반 oracle 클라우드에 배포 시
-# (1) jar 빌드
+# (1) jar 빌드 (뒤의 -x test는 테스트를 생략하겠다는 의미이다. 크게 바쁘지 않다면 테스트까지 수행하고 빌드하도록 하자)
 $ ./gradlew build -x test
 # (2) buildx로 다른 플랫폼 용 이미지를 만들고, 이 때 Dockerfile은 arm.~ 을 쓰겠다는 의미
 $ docker buildx build --platform linux/arm64 -t s4ng/stocking-back:arm . -f arm.Dockerfile
