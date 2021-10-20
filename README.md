@@ -78,4 +78,12 @@ bis.stock.back
 $ git pull https://github.com/Beauty-inside/stocking-backend.git
 
 $ ./gradlew
+
+# arm64 기반 oracle 클라우드에 배포 시
+# (1) jar 빌드
+$ ./gradlew build -x test
+# (2) buildx로 다른 플랫폼 용 이미지를 만들고, 이 때 Dockerfile은 arm.~ 을 쓰겠다는 의미
+$ docker buildx build --platform linux/arm64 -t s4ng/stocking-back:arm . -f arm.Dockerfile
+# (3) 배포할 때 mysql과 redis가 같은 환경에 컨테이너로 배포되고 있기 때문에 --link속성을 이용하여 연결시켜 준다.
+$ docker run --name api -d -p 8080:8080 --link redis --link mysql s4ng/stocking-back:arm
 ```
