@@ -7,12 +7,15 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import bis.stock.back.domain.stock.dto.StockListDto;
 import bis.stock.back.global.exception.NotFoundException;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.json.simple.JSONObject;
@@ -48,6 +51,7 @@ public class StockService {
 
       if(stockRepository.count() != stockList.size()) {
          // 한꺼번에 저장
+         stockRepository.deleteAll();
          stockRepository.saveAll(stockList);
       }
 
@@ -71,6 +75,7 @@ public class StockService {
               .orElseThrow(() -> new NotFoundException("해당 이름의 주식이 존재하지 않습니다.")).getName();
    }
 
+   // .../stock/detail?itemname=code
    public String detail(String itemcode, String itemname) {
 
       String line ="";
@@ -153,7 +158,7 @@ public class StockService {
             }
          } else { // 평일일 경우
             // 장이 열려있는 경우
-            if(nowHour > 9 && nowHour < 16) {
+            if(nowHour >= 9 && nowHour < 16) {
                // 가장 최근에 조회한 주식 가격이 5초 이전이면 다시 받아오기.
                Duration dur = Duration.between(stock.getPrice().getRecentUpdateTime(), LocalDateTime.now());
 
@@ -233,9 +238,11 @@ public class StockService {
       return stockPrice;
    }
 
-   public List<Stock> list() {
+   public List<StockListDto> list() {
 
-      // TODO : 추후에 Pageable 구현
-      return stockRepository.findAll();
+      // TODO : 추후에 Pageable 구현 <- 리스트 통째로 보내고 프론트에서 Page 구현하기
+      List<Stock> stockList = stockRepository.findAll();
+      return stockList.stream()
+              .map(StockListDto::new).collect(Collectors.toList());
    }
 }
